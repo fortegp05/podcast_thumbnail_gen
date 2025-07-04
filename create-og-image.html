@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OG Image Generator</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+        
+        .og-canvas-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        #ogCanvas {
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            background: white;
+        }
+        
+        .download-btn {
+            background: #4a5568;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .download-btn:hover {
+            background: #2d3748;
+        }
+    </style>
+</head>
+<body>
+    <div class="og-canvas-container">
+        <h1>OG Image Generator</h1>
+        <canvas id="ogCanvas" width="1200" height="630"></canvas>
+        <br><br>
+        <button class="download-btn" onclick="downloadOGImage()">OG画像をダウンロード</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('ogCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function createOGImage() {
+            // 背景グラデーション
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#4a5568');
+            gradient.addColorStop(1, '#2d3748');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // メインタイトル
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 72px Arial, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Podcast Thumbnail', canvas.width / 2, 200);
+            ctx.fillText('Generator', canvas.width / 2, 280);
+
+            // サブタイトル
+            ctx.fillStyle = '#cbd5e0';
+            ctx.font = '32px Arial, sans-serif';
+            ctx.fillText('ポッドキャスト用サムネイル作成ツール', canvas.width / 2, 350);
+
+            // 機能説明
+            ctx.fillStyle = '#a0aec0';
+            ctx.font = '24px Arial, sans-serif';
+            ctx.fillText('QRコード • ハッシュタグ • カスタム背景 対応', canvas.width / 2, 420);
+
+            // URL
+            ctx.fillStyle = '#68d391';
+            ctx.font = '20px Arial, sans-serif';
+            ctx.fillText('fortegp05.github.io/podcast_thumbnail_gen', canvas.width / 2, 500);
+
+            // 装飾要素（アイコン風）
+            ctx.fillStyle = '#68d391';
+            ctx.fillRect(100, 150, 60, 60);
+            ctx.fillRect(100, 250, 60, 60);
+            ctx.fillRect(100, 350, 60, 60);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 30px Arial, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('🎙️', 130, 185);
+            ctx.fillText('📷', 130, 285);
+            ctx.fillText('🎨', 130, 385);
+
+            // 右側装飾
+            ctx.fillStyle = '#68d391';
+            ctx.fillRect(canvas.width - 160, 150, 60, 60);
+            ctx.fillRect(canvas.width - 160, 250, 60, 60);
+            ctx.fillRect(canvas.width - 160, 350, 60, 60);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText('🔗', canvas.width - 130, 185);
+            ctx.fillText('#️⃣', canvas.width - 130, 285);
+            ctx.fillText('✨', canvas.width - 130, 385);
+        }
+
+        function downloadOGImage() {
+            const link = document.createElement('a');
+            link.download = 'og-image.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+
+        // ページ読み込み時にOG画像を生成
+        createOGImage();
+    </script>
+</body>
+</html>

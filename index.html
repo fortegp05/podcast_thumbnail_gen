@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Podcast Thumbnail Generator</title>
+    <meta name="description" content="ポッドキャスト用のサムネイル画像を簡単に作成できるWebアプリケーション。QRコード、ハッシュタグ、カスタム背景に対応。">
+    
+    <!-- OGP設定 -->
+    <meta property="og:title" content="Podcast Thumbnail Generator">
+    <meta property="og:description" content="ポッドキャスト用のサムネイル画像を簡単に作成できるWebアプリケーション。QRコード、ハッシュタグ、カスタム背景に対応。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://fortegp05.github.io/podcast_thumbnail_gen/">
+    <meta property="og:image" content="https://fortegp05.github.io/podcast_thumbnail_gen/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="Podcast Thumbnail Generator">
+    <meta property="og:locale" content="ja_JP">
+    
+    <!-- Twitter Card設定 -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Podcast Thumbnail Generator">
+    <meta name="twitter:description" content="ポッドキャスト用のサムネイル画像を簡単に作成できるWebアプリケーション。QRコード、ハッシュタグ、カスタム背景に対応。">
+    <meta name="twitter:image" content="https://fortegp05.github.io/podcast_thumbnail_gen/og-image.png">
+    
+    <!-- Favicon設定 -->
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="android-chrome-512x512.png">
+    <link rel="manifest" href="site.webmanifest">
+    
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Podcast Thumbnail Generator</h1>
+            <p>ポッドキャスト用のサムネイル画像を簡単に作成できます</p>
+            <button id="helpBtn" class="help-btn">使い方・マニュアル</button>
+        </header>
+
+        <div class="content">
+            <div class="form-section">
+                <h2>設定</h2>
+                <form id="thumbnailForm">
+                    <div class="form-group">
+                        <label for="podcastTitle">ポッドキャストタイトル</label>
+                        <input type="text" id="podcastTitle" name="podcastTitle" placeholder="例: Tech Talk Japan">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="episodeTitle">エピソードタイトル</label>
+                        <input type="text" id="episodeTitle" name="episodeTitle" placeholder="例: AI開発の最新トレンド">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="episodeDescription">エピソード概要</label>
+                        <textarea id="episodeDescription" name="episodeDescription" placeholder="エピソードの簡単な説明を入力してください"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="episodeUrl">エピソードURL</label>
+                        <input type="url" id="episodeUrl" name="episodeUrl" placeholder="https://example.com/episode">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="hashtags">ハッシュタグ</label>
+                        <input type="text" id="hashtags" name="hashtags" placeholder="#podcast #tech #AI（スペース区切り）">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="watermark">ウォーターマーク</label>
+                        <input type="text" id="watermark" name="watermark" placeholder="@username" value="@">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="backgroundImage">背景画像</label>
+                        <input type="file" id="backgroundImage" name="backgroundImage" accept="image/*">
+                        <div class="file-info">
+                            <small>推奨サイズ: 1200x630px (JPG, PNG)</small>
+                        </div>
+                    </div>
+
+
+                    <button type="button" id="generateBtn" class="btn-primary">プレビュー生成</button>
+                </form>
+            </div>
+
+            <div class="preview-section">
+                <h2>プレビュー</h2>
+                <div class="thumbnail-container">
+                    <canvas id="thumbnailCanvas" width="1200" height="630"></canvas>
+                </div>
+                <div class="preview-actions">
+                    <button type="button" id="downloadBtn" class="btn-secondary" disabled>ダウンロード</button>
+                    <button type="button" id="resetBtn" class="btn-outline">リセット</button>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2025 FORTEgp05</p>
+        </footer>
+        
+        <!-- 開発者プロフィールリンク -->
+        <div class="developer-link">
+            <a href="https://fortegp05.net/" target="_blank" rel="noopener noreferrer">
+                Made by fortegp05
+            </a>
+        </div>
+
+        <!-- マニュアルモーダル -->
+        <div id="helpModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>📚 Podcast Thumbnail Generator 使い方マニュアル</h2>
+                    <span class="close-btn" id="closeModal">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="manual-section">
+                        <h3>🎯 基本的な使い方</h3>
+                        <ol>
+                            <li><strong>ポッドキャストタイトル</strong>を入力してください</li>
+                            <li><strong>エピソードタイトル</strong>を入力してください</li>
+                            <li><strong>エピソード概要</strong>で内容を説明してください（改行対応）</li>
+                            <li><strong>プレビュー生成</strong>ボタンをクリックして確認</li>
+                            <li><strong>ダウンロード</strong>ボタンで画像を保存</li>
+                        </ol>
+                    </div>
+
+                    <div class="manual-section">
+                        <h3>🔧 詳細機能</h3>
+                        <div class="feature-grid">
+                            <div class="feature-item">
+                                <h4>🔗 エピソードURL</h4>
+                                <p>URLを入力すると自動でQRコードが生成され、サムネイルに表示されます。文字列でもURLが表示されます。</p>
+                            </div>
+                            <div class="feature-item">
+                                <h4>#️⃣ ハッシュタグ</h4>
+                                <p>スペース区切りでハッシュタグを入力できます。<br>
+                                例：<code>#podcast #tech #AI</code></p>
+                            </div>
+                            <div class="feature-item">
+                                <h4>🏷️ ウォーターマーク</h4>
+                                <p>@usernameの形式でウォーターマークを表示できます。右上に半透明で表示されます。</p>
+                            </div>
+                            <div class="feature-item">
+                                <h4>🖼️ 背景画像</h4>
+                                <p>JPG・PNG画像をアップロードして背景にできます。推奨サイズは1200x630pxです。アスペクト比を維持して表示されます。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="manual-section">
+                        <h3>💾 便利機能</h3>
+                        <ul>
+                            <li><strong>自動保存</strong>：入力内容は自動でLocalStorageに保存されます</li>
+                            <li><strong>自動復元</strong>：ページをリロードしても前回の入力が復元されます</li>
+                            <li><strong>リアルタイムプレビュー</strong>：入力すると自動でプレビューが更新されます</li>
+                            <li><strong>リセット機能</strong>：「リセット」ボタンですべてクリアできます</li>
+                        </ul>
+                    </div>
+
+                    <div class="manual-section">
+                        <h3>📐 仕様・制限</h3>
+                        <ul>
+                            <li><strong>画像サイズ</strong>：1200x630px（SNS最適化済み）</li>
+                            <li><strong>ファイル形式</strong>：PNG形式でダウンロード</li>
+                            <li><strong>背景画像</strong>：JPG、PNG形式に対応</li>
+                            <li><strong>改行対応</strong>：エピソード概要では改行が反映されます</li>
+                            <li><strong>QRコード</strong>：有効なURLを入力すると自動生成</li>
+                        </ul>
+                    </div>
+
+                    <div class="manual-section">
+                        <h3>💡 Tips & コツ</h3>
+                        <ul>
+                            <li>背景画像は横長（16:9程度）が推奨です</li>
+                            <li>エピソード概要は3-4行程度が見やすいです</li>
+                            <li>ハッシュタグは5-7個程度が効果的です</li>
+                            <li>QRコードは右下に自動配置されます</li>
+                            <li>モバイルでも使用可能です</li>
+                        </ul>
+                    </div>
+
+                    <div class="manual-section">
+                        <h3>🚀 活用例</h3>
+                        <div class="example-grid">
+                            <div class="example-item">
+                                <h4>SNS投稿用</h4>
+                                <p>Twitter、Facebook等でのエピソード告知</p>
+                            </div>
+                            <div class="example-item">
+                                <h4>YouTube用</h4>
+                                <p>ポッドキャストのYouTube版サムネイル</p>
+                            </div>
+                            <div class="example-item">
+                                <h4>ブログ用</h4>
+                                <p>ブログ記事のヘッダー画像</p>
+                            </div>
+                            <div class="example-item">
+                                <h4>配信プラットフォーム用</h4>
+                                <p>Spotify、Apple Podcast等での告知</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <p>💝 このツールが役立ちましたら、SNSでシェアしていただけると嬉しいです！</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
