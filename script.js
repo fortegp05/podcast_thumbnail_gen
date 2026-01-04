@@ -17,12 +17,21 @@ class PodcastThumbnailGenerator {
         const resetBtn = document.getElementById('resetBtn');
         const backgroundImageInput = document.getElementById('backgroundImage');
         const episodeUrlInput = document.getElementById('episodeUrl');
+        const clearEpisodeUrlBtn = document.getElementById('clearEpisodeUrlBtn');
+        const fetchRssBtn = document.getElementById('fetchRssBtn');
 
         generateBtn.addEventListener('click', () => this.generateThumbnail());
         downloadBtn.addEventListener('click', () => this.downloadThumbnail());
         resetBtn.addEventListener('click', () => this.resetForm());
         backgroundImageInput.addEventListener('change', (e) => this.handleBackgroundImageChange(e));
         episodeUrlInput.addEventListener('input', (e) => this.handleUrlChange(e));
+        clearEpisodeUrlBtn.addEventListener('click', () => {
+            document.getElementById('episodeUrl').value = '';
+            this.qrCodeDataUrl = null;
+            this.saveToLocalStorage();
+            this.generateThumbnail();
+        });
+        fetchRssBtn.addEventListener('click', () => this.fetchRssFeed());
 
         // リアルタイムプレビュー（オプション）
         const inputs = document.querySelectorAll('#thumbnailForm input, #thumbnailForm textarea, #thumbnailForm select');
@@ -96,6 +105,125 @@ class PodcastThumbnailGenerator {
         } else {
             this.qrCodeDataUrl = null;
         }
+    }
+
+    async fetchRssFeed() {
+        const rssUrlInput = document.getElementById('rssUrl');
+        const rssUrl = rssUrlInput.value.trim();
+        const fetchBtn = document.getElementById('fetchRssBtn');
+
+        if (!rssUrl) {
+            this.showNotification('RSS URLを入力してください', 'error');
+            return;
+        }
+
+        // ボタンを無効化
+        fetchBtn.disabled = true;
+        fetchBtn.textContent = '取得中...';
+
+        try {
+            const response = await fetch(rssUrl);
+
+            if (!response.ok) {
+                throw new Error(`HTTPエラー: ${response.status}`);
+            }
+
+            const xmlText = await response.text();
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+
+            // パースエラーチェック
+            const parseError = xmlDoc.querySelector('parsererror');
+            if (parseError) {
+                throw new Error('XMLのパースに失敗しました');
+            }
+
+            // RSSフィードからデータを抽出
+            const feedData = this.parseRssFeed(xmlDoc);
+
+            if (feedData) {
+                // フォームに反映
+                this.fillFormWithFeedData(feedData);
+                this.showNotification('最新エピソードを取得しました！', 'success');
+            } else {
+                throw new Error('エピソードが見つかりませんでした');
+            }
+
+        } catch (error) {
+            console.error('RSS取得エラー:', error);
+            let errorMessage = 'RSSフィードの取得に失敗しました';
+
+            if (error.message.includes('CORS')) {
+                errorMessage += '（CORS制限）';
+            } else if (error.message.includes('Failed to fetch')) {
+                errorMessage += '（ネットワークエラー）';
+            } else {
+                errorMessage += `: ${error.message}`;
+            }
+
+            this.showNotification(errorMessage, 'error', 5000);
+        } finally {
+            // ボタンを再有効化
+            fetchBtn.disabled = false;
+            fetchBtn.textContent = '取得';
+        }
+    }
+
+    parseRssFeed(xmlDoc) {
+        // チャンネルタイトルを取得
+        const channelTitle = xmlDoc.querySelector('channel > title')?.textContent || '';
+
+        // 最新のitem（エピソード）を取得
+        const latestItem = xmlDoc.querySelector('channel > item');
+
+        if (!latestItem) {
+            return null;
+        }
+
+        // エピソード情報を抽出
+        const episodeTitle = latestItem.querySelector('title')?.textContent || '';
+        const episodeLink = latestItem.querySelector('link')?.textContent || '';
+
+        // itunes:subtitleから概要を取得（名前空間を考慮）
+        let episodeDescription = '';
+        const itunesSubtitle = latestItem.querySelector('subtitle');
+        if (itunesSubtitle) {
+            episodeDescription = itunesSubtitle.textContent.trim();
+        }
+
+        return {
+            podcastTitle: channelTitle,
+            episodeTitle: episodeTitle,
+            episodeDescription: episodeDescription,
+            episodeUrl: episodeLink
+        };
+    }
+
+    fillFormWithFeedData(feedData) {
+        // エピソードタイトル
+        if (feedData.episodeTitle) {
+            document.getElementById('episodeTitle').value = feedData.episodeTitle;
+        }
+
+        // エピソード概要
+        if (feedData.episodeDescription) {
+            document.getElementById('episodeDescription').value = feedData.episodeDescription;
+        }
+
+        // エピソードURL
+        if (feedData.episodeUrl) {
+            document.getElementById('episodeUrl').value = feedData.episodeUrl;
+            // QRコードも生成
+            this.generateQRCode(feedData.episodeUrl);
+        }
+
+        // LocalStorageに保存
+        this.saveToLocalStorage();
+
+        // プレビューを自動生成
+        setTimeout(() => {
+            this.generateThumbnail();
+        }, 300);
     }
 
     generateQRCode(url) {
@@ -308,26 +436,27 @@ class PodcastThumbnailGenerator {
         if (savedData) {
             try {
                 const data = JSON.parse(savedData);
-                
+
                 // データが空でない場合のみ復元
-                const hasData = data.podcastTitle || data.episodeTitle || data.episodeDescription || data.episodeUrl || data.hashtags || (data.watermark && data.watermark !== '@');
-                
+                const hasData = data.podcastTitle || data.episodeTitle || data.episodeDescription || data.episodeUrl || data.hashtags || (data.watermark && data.watermark !== '@') || data.rssUrl;
+
                 if (hasData) {
+                    document.getElementById('rssUrl').value = data.rssUrl || '';
                     document.getElementById('podcastTitle').value = data.podcastTitle || '';
                     document.getElementById('episodeTitle').value = data.episodeTitle || '';
                     document.getElementById('episodeDescription').value = data.episodeDescription || '';
                     document.getElementById('episodeUrl').value = data.episodeUrl || '';
                     document.getElementById('hashtags').value = data.hashtags || '';
                     document.getElementById('watermark').value = data.watermark || '@';
-                    
+
                     // URLがある場合はQRコードも生成
                     if (data.episodeUrl) {
                         this.generateQRCode(data.episodeUrl);
                     }
-                    
+
                     // 通知を表示
                     this.showNotification('前回の入力内容を復元しました', 'info');
-                    
+
                     // サムネイルのプレビューを自動実行
                     setTimeout(() => {
                         this.generateThumbnail();
@@ -341,6 +470,7 @@ class PodcastThumbnailGenerator {
 
     saveToLocalStorage() {
         const data = {
+            rssUrl: document.getElementById('rssUrl').value,
             podcastTitle: document.getElementById('podcastTitle').value,
             episodeTitle: document.getElementById('episodeTitle').value,
             episodeDescription: document.getElementById('episodeDescription').value,
@@ -348,7 +478,7 @@ class PodcastThumbnailGenerator {
             hashtags: document.getElementById('hashtags').value,
             watermark: document.getElementById('watermark').value
         };
-        
+
         try {
             localStorage.setItem('podcastThumbnailData', JSON.stringify(data));
         } catch (error) {

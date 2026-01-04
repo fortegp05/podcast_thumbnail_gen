@@ -193,6 +193,74 @@ header p {
     color: white;
 }
 
+.btn-clear {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #dc3545;
+    color: white;
+    margin-top: 8px;
+}
+
+.btn-clear:hover {
+    background: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);
+}
+
+.btn-fetch {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #17a2b8;
+    color: white;
+    white-space: nowrap;
+}
+
+.btn-fetch:hover {
+    background: #138496;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(23, 162, 184, 0.4);
+}
+
+.btn-fetch:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.rss-fetch-group {
+    background: #f0f9ff;
+    padding: 15px;
+    border-radius: 8px;
+    border: 2px solid #17a2b8;
+}
+
+.rss-input-group {
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
+}
+
+.rss-input-group input {
+    flex: 1;
+}
+
+.rss-info {
+    display: block;
+    margin-top: 8px;
+    color: #17a2b8;
+    font-size: 0.85em;
+}
+
 /* フッター */
 footer {
     text-align: center;
@@ -279,6 +347,10 @@ footer {
 
 .notification.info {
     background: #17a2b8;
+}
+
+.notification.error {
+    background: #dc3545;
 }
 
 /* 開発者リンク */
