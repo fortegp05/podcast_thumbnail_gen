@@ -17,7 +17,6 @@ class PodcastThumbnailGenerator {
         const resetBtn = document.getElementById('resetBtn');
         const backgroundImageInput = document.getElementById('backgroundImage');
         const episodeUrlInput = document.getElementById('episodeUrl');
-        const clearEpisodeUrlBtn = document.getElementById('clearEpisodeUrlBtn');
         const fetchRssBtn = document.getElementById('fetchRssBtn');
 
         generateBtn.addEventListener('click', () => this.generateThumbnail());
@@ -25,12 +24,6 @@ class PodcastThumbnailGenerator {
         resetBtn.addEventListener('click', () => this.resetForm());
         backgroundImageInput.addEventListener('change', (e) => this.handleBackgroundImageChange(e));
         episodeUrlInput.addEventListener('input', (e) => this.handleUrlChange(e));
-        clearEpisodeUrlBtn.addEventListener('click', () => {
-            document.getElementById('episodeUrl').value = '';
-            this.qrCodeDataUrl = null;
-            this.saveToLocalStorage();
-            this.generateThumbnail();
-        });
         fetchRssBtn.addEventListener('click', () => this.fetchRssFeed());
 
         // リアルタイムプレビュー（オプション）
