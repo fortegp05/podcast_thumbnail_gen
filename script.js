@@ -26,6 +26,14 @@ class PodcastThumbnailGenerator {
         episodeUrlInput.addEventListener('input', (e) => this.handleUrlChange(e));
         fetchRssBtn.addEventListener('click', () => this.fetchRssFeed());
 
+        // SNS本文の自動更新
+        const episodeTitleInput = document.getElementById('episodeTitle');
+        const episodeDescriptionInput = document.getElementById('episodeDescription');
+
+        episodeTitleInput.addEventListener('input', () => this.updateSnsText());
+        episodeDescriptionInput.addEventListener('input', () => this.updateSnsText());
+        episodeUrlInput.addEventListener('input', () => this.updateSnsText());
+
         // リアルタイムプレビュー（オプション）
         const inputs = document.querySelectorAll('#thumbnailForm input, #thumbnailForm textarea, #thumbnailForm select');
         inputs.forEach(input => {
@@ -98,6 +106,18 @@ class PodcastThumbnailGenerator {
         } else {
             this.qrCodeDataUrl = null;
         }
+    }
+
+    updateSnsText() {
+        const episodeTitle = document.getElementById('episodeTitle').value;
+        const episodeDescription = document.getElementById('episodeDescription').value;
+        const episodeUrl = document.getElementById('episodeUrl').value;
+        const snsTextArea = document.getElementById('snsText');
+
+        // SNS本文のテンプレートを生成
+        let snsText = `Podcast #aozorafm 新Ep配信！\n『${episodeTitle}』\n\n${episodeDescription}\n\n${episodeUrl}`;
+
+        snsTextArea.value = snsText;
     }
 
     async fetchRssFeed() {
@@ -209,6 +229,9 @@ class PodcastThumbnailGenerator {
             // QRコードも生成
             this.generateQRCode(feedData.episodeUrl);
         }
+
+        // SNS本文を更新
+        this.updateSnsText();
 
         // LocalStorageに保存
         this.saveToLocalStorage();
@@ -452,6 +475,7 @@ class PodcastThumbnailGenerator {
                     document.getElementById('episodeTitle').value = data.episodeTitle || '';
                     document.getElementById('episodeDescription').value = data.episodeDescription || '';
                     document.getElementById('episodeUrl').value = data.episodeUrl || '';
+                    document.getElementById('snsText').value = data.snsText || '';
                     document.getElementById('hashtags').value = data.hashtags || '';
                     document.getElementById('watermark').value = data.watermark || '@';
 
@@ -481,6 +505,7 @@ class PodcastThumbnailGenerator {
             episodeTitle: document.getElementById('episodeTitle').value,
             episodeDescription: document.getElementById('episodeDescription').value,
             episodeUrl: document.getElementById('episodeUrl').value,
+            snsText: document.getElementById('snsText').value,
             hashtags: document.getElementById('hashtags').value,
             watermark: document.getElementById('watermark').value
         };
@@ -526,6 +551,7 @@ class PodcastThumbnailGenerator {
     resetForm() {
         document.getElementById('thumbnailForm').reset();
         document.getElementById('watermark').value = '@';
+        document.getElementById('snsText').value = '';
         this.backgroundImage = null;
         this.qrCodeDataUrl = null;
         this.loadDefaultBackground();
