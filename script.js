@@ -287,6 +287,9 @@ class PodcastThumbnailGenerator {
         // ウォーターマークを描画
         this.drawWatermark(data.watermark, colors, fonts);
 
+        // canvasの内容をimgタグに反映
+        this.updateImagePreview();
+
         // ダウンロードボタンを有効化
         document.getElementById('downloadBtn').disabled = false;
     }
@@ -406,8 +409,18 @@ class PodcastThumbnailGenerator {
 
             // QRコードを描画
             this.ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+
+            // QRコード描画後にimgタグを更新
+            this.updateImagePreview();
         };
         qrImg.src = this.qrCodeDataUrl;
+    }
+
+    updateImagePreview() {
+        const thumbnailImage = document.getElementById('thumbnailImage');
+        if (thumbnailImage) {
+            thumbnailImage.src = this.canvas.toDataURL('image/png');
+        }
     }
 
     drawWatermark(watermark, colors, fonts) {
@@ -517,10 +530,16 @@ class PodcastThumbnailGenerator {
         this.qrCodeDataUrl = null;
         this.loadDefaultBackground();
         document.getElementById('downloadBtn').disabled = true;
-        
+
+        // imgタグもクリア
+        const thumbnailImage = document.getElementById('thumbnailImage');
+        if (thumbnailImage) {
+            thumbnailImage.src = '';
+        }
+
         // LocalStorageもクリア
         localStorage.removeItem('podcastThumbnailData');
-        
+
         // リセット通知
         this.showNotification('フォームをリセットしました', 'success');
     }
