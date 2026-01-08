@@ -18,6 +18,9 @@ class PodcastThumbnailGenerator {
         const backgroundImageInput = document.getElementById('backgroundImage');
         const episodeUrlInput = document.getElementById('episodeUrl');
         const fetchRssBtn = document.getElementById('fetchRssBtn');
+        const copySnsBtn = document.getElementById('copySnsBtn');
+        const copyUrlBtn = document.getElementById('copyUrlBtn');
+        const copyTitleBtn = document.getElementById('copyTitleBtn');
 
         generateBtn.addEventListener('click', () => this.generateThumbnail());
         downloadBtn.addEventListener('click', () => this.downloadThumbnail());
@@ -25,6 +28,9 @@ class PodcastThumbnailGenerator {
         backgroundImageInput.addEventListener('change', (e) => this.handleBackgroundImageChange(e));
         episodeUrlInput.addEventListener('input', (e) => this.handleUrlChange(e));
         fetchRssBtn.addEventListener('click', () => this.fetchRssFeed());
+        copySnsBtn.addEventListener('click', () => this.copySnsText());
+        copyUrlBtn.addEventListener('click', () => this.copyEpisodeUrl());
+        copyTitleBtn.addEventListener('click', () => this.copyEpisodeTitle());
 
         // SNS本文の自動更新
         const episodeTitleInput = document.getElementById('episodeTitle');
@@ -546,6 +552,88 @@ class PodcastThumbnailGenerator {
                 }
             }, 300);
         }, duration);
+    }
+
+    copySnsText() {
+        const snsTextArea = document.getElementById('snsText');
+        const snsText = snsTextArea.value;
+
+        if (!snsText) {
+            this.showNotification('コピーする内容がありません', 'error');
+            return;
+        }
+
+        // Clipboard APIを使用してコピー
+        navigator.clipboard.writeText(snsText)
+            .then(() => {
+                this.showNotification('クリップボードにコピーしました', 'success');
+            })
+            .catch((error) => {
+                console.error('コピーエラー:', error);
+                // フォールバック: 古いやり方でコピー
+                this.fallbackCopyText(snsText);
+            });
+    }
+
+    copyEpisodeUrl() {
+        const episodeUrlInput = document.getElementById('episodeUrl');
+        const episodeUrl = episodeUrlInput.value;
+
+        if (!episodeUrl) {
+            this.showNotification('コピーするURLがありません', 'error');
+            return;
+        }
+
+        // Clipboard APIを使用してコピー
+        navigator.clipboard.writeText(episodeUrl)
+            .then(() => {
+                this.showNotification('URLをクリップボードにコピーしました', 'success');
+            })
+            .catch((error) => {
+                console.error('コピーエラー:', error);
+                // フォールバック: 古いやり方でコピー
+                this.fallbackCopyText(episodeUrl);
+            });
+    }
+
+    copyEpisodeTitle() {
+        const episodeTitleInput = document.getElementById('episodeTitle');
+        const episodeTitle = episodeTitleInput.value;
+
+        if (!episodeTitle) {
+            this.showNotification('コピーするタイトルがありません', 'error');
+            return;
+        }
+
+        // Clipboard APIを使用してコピー
+        navigator.clipboard.writeText(episodeTitle)
+            .then(() => {
+                this.showNotification('タイトルをクリップボードにコピーしました', 'success');
+            })
+            .catch((error) => {
+                console.error('コピーエラー:', error);
+                // フォールバック: 古いやり方でコピー
+                this.fallbackCopyText(episodeTitle);
+            });
+    }
+
+    fallbackCopyText(text) {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.select();
+
+        try {
+            document.execCommand('copy');
+            this.showNotification('クリップボードにコピーしました', 'success');
+        } catch (error) {
+            console.error('コピーエラー:', error);
+            this.showNotification('コピーに失敗しました', 'error');
+        }
+
+        document.body.removeChild(textArea);
     }
 
     resetForm() {

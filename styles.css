@@ -238,6 +238,26 @@ header p {
     transform: none;
 }
 
+.btn-copy {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #6c757d;
+    color: white;
+    margin-top: 8px;
+    width: 100%;
+}
+
+.btn-copy:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(108, 117, 125, 0.4);
+}
+
 .rss-fetch-group {
     background: #f0f9ff;
     padding: 15px;
